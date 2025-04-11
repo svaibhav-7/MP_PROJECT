@@ -1,0 +1,880 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  /* Base Styling with Custom Properties */
+  :root {
+    --primary: #4361ee;
+    --primary-dark: #3a0ca3;
+    --secondary: #7209b7;
+    --accent: #f72585;
+    --light: #f8edeb;
+    --dark: #222;
+    --success: #2ec4b6;
+    --warning: #ff9f1c;
+    --danger: #e63946;
+    --info: #4cc9f0;
+    --glass: rgba(255, 255, 255, 0.25);
+    --glass-darker: rgba(255, 255, 255, 0.92);
+    --shadow-soft: 0 8px 32px rgba(31, 38, 135, 0.15);
+    --shadow-strong: 0 8px 32px rgba(31, 38, 135, 0.37);
+  }
+
+  /* Main Background & Layout */
+  .page-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(45deg, #0f172a, #334155);
+    padding: 30px 0;
+  }
+
+  /* Animated Background */
+  .animated-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.6;
+    animation: float 25s infinite ease-in-out;
+    z-index: -1;
+  }
+
+  .orb-1 {
+    width: 400px;
+    height: 400px;
+    top: -100px;
+    left: -100px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    animation-delay: 0s;
+  }
+
+  .orb-2 {
+    width: 600px;
+    height: 600px;
+    bottom: -200px;
+    right: -100px;
+    background: linear-gradient(to right, var(--accent), var(--secondary));
+    animation-delay: -5s;
+  }
+
+  .orb-3 {
+    width: 300px;
+    height: 300px;
+    bottom: 50%;
+    left: 30%;
+    background: linear-gradient(to right, var(--success), var(--primary));
+    animation-delay: -10s;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(80px, -40px) scale(1.05);
+    }
+    66% {
+      transform: translate(-60px, 20px) scale(0.95);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  /* Geometric Pattern Overlay */
+  .geometry-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    opacity: 0.4;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Main Content Card */
+  .content-container {
+    position: relative;
+    z-index: 10;
+    width: 92%;
+    max-width: 1140px;
+    margin: 0 auto;
+  }
+
+  .glass-card {
+    background: var(--glass-darker);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: var(--shadow-soft);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .glass-card:hover {
+    box-shadow: var(--shadow-strong);
+  }
+
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 40%);
+    pointer-events: none;
+  }
+
+  /* Card Header */
+  .card-header {
+    background: linear-gradient(to right, var(--primary), var(--primary-dark));
+    color: white;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.25);
+  }
+
+  .card-header h2 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.75rem;
+  }
+
+  .card-header i {
+    font-size: 1.5rem;
+  }
+
+  /* Form Styling */
+  .form-label {
+    color: var(--dark);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-control {
+    border-radius: 12px;
+    padding: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .form-control:focus {
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+    border-color: var(--primary);
+    background: white;
+  }
+
+  .form-text {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+
+  /* Row Sections with Card Style */
+  .section-card {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+    transition: all 0.3s;
+  }
+
+  .section-card:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Subjects List Styling */
+  .subjects-container {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    min-height: 120px;
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .sortable-list {
+    min-height: 50px;
+  }
+
+  .sortable-item {
+    cursor: move;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 10px;
+    background: white;
+    border-left: 4px solid var(--primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+  }
+
+  .sortable-item:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .sortable-ghost {
+    opacity: 0.4;
+  }
+
+  .sortable-chosen {
+    background-color: #e9ecef;
+  }
+
+  .handle {
+    cursor: move;
+    color: var(--primary);
+  }
+
+  /* Subject Entry */
+  .subject-input-group {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+
+  .subject-input-group input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    flex-grow: 1;
+  }
+
+  .subject-input-group button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background: linear-gradient(to right, var(--success), #20a090);
+    border: none;
+    color: white;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s;
+  }
+
+  .subject-input-group button:hover {
+    background: linear-gradient(to right, #26a69a, #1a8579);
+    box-shadow: 0 4px 8px rgba(46, 196, 182, 0.3);
+  }
+
+  /* Summary Card */
+  .summary-card {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+  }
+
+  .summary-header {
+    background: linear-gradient(to right, var(--info), #3aa8d9);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin: -1.5rem -1.5rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 6px rgba(76, 201, 240, 0.2);
+  }
+
+  .summary-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .summary-stat i {
+    color: var(--primary);
+    font-size: 1.2rem;
+  }
+
+  .progress {
+    height: 12px;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.05);
+    margin-top: 1rem;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    background: linear-gradient(to right, var(--success), #20a090);
+    border-radius: 6px;
+    transition: width 0.8s ease;
+  }
+
+  /* Buttons */
+  .btn {
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 490%;
+    width: 150%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-98%) translateY(-25%) rotate(45deg);
+    transition: all 0.3s ease-out;
+    z-index: -1;
+  }
+
+  .btn:hover::after {
+    transform: translateX(-9%) translateY(-25%) rotate(45deg);
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, var(--primary), var(--primary-dark));
+    color: white;
+    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.25);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 8px 20px rgba(67, 97, 238, 0.35);
+    transform: translateY(-2px);
+  }
+
+  .btn-outline-secondary, .btn-outline-info {
+    background: transparent;
+    color: var(--dark);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .btn-outline-info:hover {
+    background-color: var(--info);
+    color: white;
+    box-shadow: 0 4px 15px rgba(76, 201, 240, 0.25);
+    transform: translateY(-2px);
+  }
+
+  /* Remove button */
+  .btn-danger {
+    background: linear-gradient(to right, var(--danger), #d32f2f);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+  }
+
+  .btn-danger:hover {
+    background: linear-gradient(to right, #d32f2f, #b71c1c);
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(230, 57, 70, 0.4);
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .glass-card {
+      padding: 1.5rem;
+    }
+
+    .subject-input-group {
+      flex-direction: column;
+    }
+
+    .subject-input-group input {
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+    }
+
+    .subject-input-group button {
+      border-radius: 12px;
+      width: 100%;
+    }
+
+    .btn {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<div class="page-wrapper">
+  <!-- Animated Background -->
+  <div class="animated-background">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="geometry-overlay"></div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="content-container">
+    <div class="glass-card">
+      <div class="card-header">
+        <i class="bi bi-sliders"></i>
+        <h2>Study Preferences</h2>
+      </div>
+      
+      <form id="studyPreferencesForm" method="post" novalidate>
+        {% csrf_token %}
+        
+        <!-- Hidden fields for dynamic data -->
+        <input type="hidden" id="subjectsData" name="subjects">
+        <input type="hidden" id="prioritiesData" name="priorities">
+        
+        <!-- Time Settings -->
+        <div class="section-card" data-aos="fade-up">
+          <div class="section-title">
+            <i class="bi bi-calendar-check"></i> Schedule Settings
+          </div>
+          
+          <div class="row">
+            <!-- Study Date -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="studyDate" class="form-label">
+                  <i class="bi bi-calendar-date"></i> Study Date
+                </label>
+                <input type="date" class="form-control" id="studyDate" name="study_date"
+                       value="{{ form.study_date.value|default:'' }}">
+                <small class="form-text">When do you want to study?</small>
+              </div>
+            </div>
+            
+            <!-- Start Time -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="startTime" class="form-label">
+                  <i class="bi bi-clock"></i> Preferred Start Time
+                </label>
+                <input type="time" class="form-control" id="startTime" name="start_time"
+                       value="{{ form.start_time.value|default:'09:00' }}">
+                <small class="form-text">When do you want to begin studying?</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Session Settings -->
+        <div class="section-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="section-title">
+            <i class="bi bi-stopwatch"></i> Session Configuration
+          </div>
+          
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="sessionLength" class="form-label">
+                  <i class="bi bi-hourglass-split"></i> Session Length
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="sessionLength" 
+                         name="session_length" min="15" max="180" step="5"
+                         value="{{ form.session_length.value|default:'45' }}">
+                  <span class="input-group-text">mins</span>
+                </div>
+                <small class="form-text">Recommended: 25-45 minutes</small>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="totalStudyTime" class="form-label">
+                  <i class="bi bi-book"></i> Total Study Time
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="totalStudyTime"
+                         name="total_study_time" min="1" max="12" step="0.5"
+                         value="{{ form.total_study_time.value|default:'8' }}">
+                  <span class="input-group-text">hours</span>
+                </div>
+                <small class="form-text">How long you'll study in total</small>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="leisureTime" class="form-label">
+                  <i class="bi bi-emoji-smile"></i> Leisure Time
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="leisureTime"
+                         name="leisure_time" min="0" max="8" step="0.5"
+                         value="{{ form.leisure_time.value|default:'2' }}">
+                  <span class="input-group-text">hours</span>
+                </div>
+                <small class="form-text">Time for relaxation</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Break Settings -->
+        <div class="section-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="section-title">
+            <i class="bi bi-cup-hot"></i> Break Settings
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="numBreaks" class="form-label">
+                  <i class="bi bi-pause-circle"></i> Number of Breaks
+                </label>
+                <input type="number" class="form-control" id="numBreaks"
+                       name="num_breaks" min="0" max="10"
+                       value="{{ form.num_breaks.value|default:'4' }}">
+                <small class="form-text">How many breaks during your study session</small>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="breakDuration" class="form-label">
+                  <i class="bi bi-hourglass"></i> Break Duration
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="breakDuration"
+                         name="break_duration" min="5" max="30" step="5"
+                         value="{{ form.break_duration.value|default:'15' }}">
+                  <span class="input-group-text">mins</span>
+                </div>
+                <small class="form-text">Recommended: 5-15 minutes</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Subjects Management -->
+        <div class="section-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="section-title">
+            <i class="bi bi-journal-bookmark"></i> Subject Management
+          </div>
+          
+          <div class="subject-input-group">
+            <input type="text" id="newSubjectInput" class="form-control" 
+                   placeholder="Enter subject name (e.g., Mathematics, Physics)">
+            <button type="button" id="addSubjectBtn" class="btn btn-success">
+              <i class="bi bi-plus-circle"></i> Add
+            </button>
+          </div>
+          
+          <div class="subjects-container">
+            <ul id="subjectList" class="list-unstyled sortable-list">
+              {% for subject in saved_subjects %}
+              <li class="sortable-item d-flex justify-content-between align-items-center"
+                  data-subject="{{ subject }}">
+                <span>
+                  <i class="bi bi-grip-vertical handle me-2"></i>
+                  {{ subject }}
+                </span>
+                <button type="button" class="btn btn-danger remove-subject">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          
+          <small class="form-text mt-2">
+            <i class="bi bi-info-circle"></i> Drag to reorder subjects (higher priority at top). Top subjects will receive more study time.
+          </small>
+        </div>
+        
+        <!-- Summary Card -->
+        <div class="summary-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="summary-header">
+            <i class="bi bi-graph-up"></i> Plan Summary
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="summary-stat">
+                <i class="bi bi-clock-history"></i>
+                <strong>Total Study Time:</strong> <span id="totalTimeDisplay">8</span> hours
+              </div>
+              <div class="summary-stat">
+                <i class="bi bi-stopwatch"></i>
+                <strong>Session Duration:</strong> <span id="sessionDurationDisplay">45</span> mins
+              </div>
+              <div class="summary-stat">
+                <i class="bi bi-collection"></i>
+                <strong>Estimated Sessions:</strong> <span id="estimatedSessions">10</span>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="summary-stat">
+                <i class="bi bi-cup"></i>
+                <strong>Breaks:</strong> <span id="breakCountDisplay">4</span> × <span id="breakDurationDisplay">15</span> mins
+              </div>
+              <div class="summary-stat">
+                <i class="bi bi-lightning-charge"></i>
+                <strong>Study Efficiency:</strong> <span id="efficiencyDisplay">85</span>%
+              </div>
+              <div class="summary-stat">
+                <i class="bi bi-book"></i>
+                <strong>Subjects:</strong> <span id="subjectCountDisplay">0</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="progress">
+            <div id="efficiencyBar" class="progress-bar" 
+                 role="progressbar" style="width: 85%"></div>
+          </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="d-flex justify-content-between flex-wrap">
+          <button type="submit" class="btn btn-primary px-4">
+            <i class="bi bi-save"></i> Save Preferences
+          </button>
+          <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-house"></i> Home
+            </a>
+            <a href="{% url 'study_plan' %}" class="btn btn-outline-info">
+              <i class="bi bi-calendar-check"></i> View Plan
+            </a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+
+<!-- SortableJS for drag-and-drop -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+
+<!-- AOS Library for Animations -->
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script>
+  // Initialize AOS
+  document.addEventListener('DOMContentLoaded', function() {
+    AOS.init({
+      duration: 800,
+      easing: 'ease-out',
+      once: true
+    });
+  });
+
+  // Initialize SortableJS for drag-and-drop
+  new Sortable(document.getElementById('subjectList'), {
+    animation: 150,
+    handle: '.handle',
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    dragClass: 'sortable-drag'
+  });
+
+  // Add new subject
+  document.getElementById('addSubjectBtn').addEventListener('click', function() {
+    const input = document.getElementById('newSubjectInput');
+    const subjectName = input.value.trim();
+    
+    if (subjectName) {
+      const subjectList = document.getElementById('subjectList');
+      const newItem = document.createElement('li');
+      newItem.className = 'sortable-item d-flex justify-content-between align-items-center';
+      newItem.dataset.subject = subjectName;
+      newItem.innerHTML = `
+        <span><i class="bi bi-grip-vertical handle me-2"></i>${subjectName}</span>
+        <button type="button" class="btn btn-danger remove-subject">
+          <i class="bi bi-trash"></i>
+        </button>
+      `;
+      subjectList.appendChild(newItem);
+      input.value = '';
+      
+      // Add event listener for remove button
+      newItem.querySelector('.remove-subject').addEventListener('click', function() {
+        newItem.remove();
+        updateSummary();
+      });
+      
+      updateSummary();
+    }
+  });
+
+  // Allow pressing Enter to add subject
+  document.getElementById('newSubjectInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('addSubjectBtn').click();
+    }
+  });
+
+  // Remove subject
+  document.querySelectorAll('.remove-subject').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.closest('li').remove();
+      updateSummary();
+    });
+  });
+
+  // Form submission handler
+  document.getElementById('studyPreferencesForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Collect subjects and priorities
+    const subjectItems = Array.from(document.querySelectorAll('#subjectList li'));
+    const subjects = subjectItems.map(item => item.dataset.subject);
+    
+    // If no subjects, alert the user
+    if (subjects.length === 0) {
+      alert('Please add at least one subject before saving.');
+      return;
+    }
+    
+    // Higher priority first (10, 9, 8, etc.)
+    const priorities = subjects.map((_, index) => 10 - (index * (10 / Math.max(1, subjects.length - 1)))); 
+    
+    document.getElementById('subjectsData').value = JSON.stringify(subjects);
+    document.getElementById('prioritiesData').value = JSON.stringify(priorities);
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+    submitBtn.disabled = true;
+    
+    // Submit form data
+    const formData = new FormData(this);
+    fetch("{% url 'study_preferences' %}", {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = data.redirect_url || "{% url 'study_plan' %}";
+      } else {
+        throw new Error(data.message || 'Failed to save preferences');
+      }
+    })
+    .catch(error => {
+      alert(error.message);
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    });
+  });
+
+  // Update summary display
+  function updateSummary() {
+    const subjectCount = document.querySelectorAll('#subjectList li').length;
+    const totalTime = parseFloat(document.getElementById('totalStudyTime').value);
+    const sessionLength = parseInt(document.getElementById('sessionLength').value);
+    const breaks = parseInt(document.getElementById('numBreaks').value);
+    const breakDuration = parseInt(document.getElementById('breakDuration').value);
+
+    document.getElementById('subjectCountDisplay').textContent = subjectCount;
+    document.getElementById('totalTimeDisplay').textContent = totalTime;
+    document.getElementById('sessionDurationDisplay').textContent = sessionLength;
+    document.getElementById('breakCountDisplay').textContent = breaks;
+    document.getElementById('breakDurationDisplay').textContent = breakDuration;
+
+    // Calculate estimated sessions
+    const totalMinutes = totalTime * 60;
+    const estimatedSessions = Math.floor(totalMinutes / (sessionLength + breakDuration));
+    document.getElementById('estimatedSessions').textContent = estimatedSessions;
+
+    // Calculate efficiency
+    const totalBreakTime = breaks * breakDuration;
+    const efficiency = Math.round(((totalTime * 60 - totalBreakTime) / (totalTime * 60)) * 100);
+    document.getElementById('efficiencyDisplay').textContent = efficiency;
+    document.getElementById('efficiencyBar').style.width = `${efficiency}%`;
+  }
+
+  // Add event listeners for summary updates
+  ['totalStudyTime', 'sessionLength', 'numBreaks', 'breakDuration'].forEach(id => {
+    document.getElementById(id).addEventListener('change', updateSummary);
+  });
+
+  // Initial summary update
+  updateSummary();
+</script>
+{% endblock %}

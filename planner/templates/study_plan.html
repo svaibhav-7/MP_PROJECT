@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  /* Base Styling with Custom Properties */
+  :root {
+    --primary: #4361ee;
+    --primary-dark: #3a0ca3;
+    --secondary: #7209b7;
+    --accent: #f72585;
+    --light: #f8edeb;
+    --dark: #222;
+    --success: #2ec4b6;
+    --warning: #ff9f1c;
+    --danger: #e63946;
+    --info: #4cc9f0;
+    --glass: rgba(255, 255, 255, 0.25);
+    --glass-darker: rgba(255, 255, 255, 0.92);
+    --shadow-soft: 0 8px 32px rgba(31, 38, 135, 0.15);
+    --shadow-strong: 0 8px 32px rgba(31, 38, 135, 0.37);
+  }
+
+  /* Main Background & Layout */
+  .page-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(45deg, #0f172a, #334155);
+    padding: 30px 0;
+  }
+
+  /* Animated Background */
+  .animated-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.6;
+    animation: float 25s infinite ease-in-out;
+    z-index: -1;
+  }
+
+  .orb-1 {
+    width: 400px;
+    height: 400px;
+    top: -100px;
+    left: -100px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    animation-delay: 0s;
+  }
+
+  .orb-2 {
+    width: 600px;
+    height: 600px;
+    bottom: -200px;
+    right: -100px;
+    background: linear-gradient(to right, var(--accent), var(--secondary));
+    animation-delay: -5s;
+  }
+
+  .orb-3 {
+    width: 300px;
+    height: 300px;
+    bottom: 50%;
+    left: 30%;
+    background: linear-gradient(to right, var(--success), var(--primary));
+    animation-delay: -10s;
+  }
+
+  @keyframes float {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(80px, -40px) scale(1.05); }
+    66% { transform: translate(-60px, 20px) scale(0.95); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+
+  /* Main Content Card */
+  .content-container {
+    position: relative;
+    z-index: 10;
+    width: 92%;
+    max-width: 1140px;
+    margin: 0 auto;
+  }
+
+  .glass-card {
+    background: var(--glass-darker);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: var(--shadow-soft);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Table Styling */
+  .table {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .thead-dark {
+    background: linear-gradient(to right, var(--primary), var(--primary-dark));
+    color: white;
+  }
+
+  .table th {
+    border: none;
+    padding: 1rem;
+  }
+
+  .table td {
+    padding: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    vertical-align: middle;
+  }
+
+  /* Timer Controls */
+  .timer-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .timer-display {
+    font-family: monospace;
+    font-size: 1.1em;
+    min-width: 60px;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+  }
+
+  /* Buttons */
+  .btn {
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+  }
+
+  .btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, var(--primary), var(--primary-dark));
+    color: white;
+    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.25);
+  }
+
+  .btn-success {
+    background: linear-gradient(to right, var(--success), #20a090);
+  }
+
+  .btn-warning {
+    background: linear-gradient(to right, var(--warning), #f48c06);
+  }
+
+  .btn-danger {
+    background: linear-gradient(to right, var(--danger), #d32f2f);
+  }
+</style>
+
+<div class="page-wrapper">
+  <!-- Animated Background -->
+  <div class="animated-background">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="content-container">
+    <div class="glass-card">
+      <h2 class="text-center mb-4">📚 Your Study Plan</h2>
+
+      <div class="text-end mb-3">
+        <button id="darkModeToggle" class="btn btn-sm btn-outline-dark">🌙 Dark Mode</button>
+      </div>
+
+      {% if error %}
+      <div class="alert alert-danger text-center">{{ error }}</div>
+      {% else %}
+      <div class="table-responsive mt-4">
+        <table id="studyTable" class="table table-bordered table-striped text-center shadow">
+          <thead class="thead-dark">
+            <tr>
+              <th>⏰ Time Slot</th>
+              <th>📖 Subject</th>
+              <th>✅ Activity</th>
+              <th>⏲️ Timer</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for slot in study_slots %}
+            <tr>
+              <td>{{ slot.time }}</td>
+              <td>{{ slot.subject }}</td>
+              <td>{{ slot.activity }}</td>
+              <td class="timer-cell">
+                <div class="timer-controls">
+                  <button class="btn btn-sm btn-success startTimer" data-duration="45">
+                    <i class="fas fa-play"></i>
+                  </button>
+                  <span class="timer-display">00:00</span>
+                  <button class="btn btn-sm btn-warning pauseTimer" disabled>
+                    <i class="fas fa-pause"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger stopTimer" disabled>
+                    <i class="fas fa-stop"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      <div class="text-center mt-4">
+        <a class="btn btn-primary" href="{% url 'study_preferences' %}">✏ Modify Preferences</a>
+        <a class="btn btn-secondary" href="{% url 'home' %}">🏠 Home</a>
+        <button id="downloadPDF" class="btn btn-success">📥 Download PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    // Dark Mode Toggle
+    document.getElementById("darkModeToggle").addEventListener("click", function() {
+        document.body.classList.toggle("bg-dark");
+        document.body.classList.toggle("text-white");
+        document.querySelectorAll("table").forEach(table => table.classList.toggle("table-dark"));
+    });
+
+    // Study Timer Functionality
+    document.querySelectorAll(".startTimer").forEach(button => {
+        let timerInterval;
+        let remainingTime;
+        const startButton = button;
+        const display = button.nextElementSibling;
+        const pauseButton = display.nextElementSibling;
+        const stopButton = pauseButton.nextElementSibling;
+        let isPaused = false;
+
+        startButton.addEventListener("click", function() {
+            if (isPaused) {
+                duration = remainingTime;
+            } else {
+                duration = parseInt(this.dataset.duration) * 60;
+            }
+            
+            startButton.disabled = true;
+            pauseButton.disabled = false;
+            stopButton.disabled = false;
+            isPaused = false;
+            
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(function() {
+                let minutes = Math.floor(duration / 60);
+                let seconds = duration % 60;
+                display.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+                duration--;
+                remainingTime = duration;
+
+                if (duration < 0) {
+                    clearInterval(timerInterval);
+                    display.textContent = "✅ Done!";
+                    startButton.disabled = false;
+                    pauseButton.disabled = true;
+                    stopButton.disabled = true;
+                    
+                    // Optional: Play sound when timer completes
+                    new Audio('/static/timer-complete.mp3').play().catch(() => {});
+                }
+            }, 1000);
+        });
+
+        pauseButton.addEventListener("click", function() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                isPaused = true;
+                startButton.disabled = false;
+                pauseButton.disabled = true;
+            }
+        });
+
+        stopButton.addEventListener("click", function() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                display.textContent = "00:00";
+                startButton.disabled = false;
+                pauseButton.disabled = true;
+                stopButton.disabled = true;
+                isPaused = false;
+            }
+        });
+    });
+
+    // Download Study Plan as PDF
+    document.getElementById("downloadPDF").addEventListener("click", function() {
+        let tableHTML = document.getElementById("studyTable").outerHTML;
+        let style = `
+            <style>
+                body { font-family: Arial, sans-serif; }
+                table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+                th, td { border: 1px solid black; padding: 8px; text-align: center; }
+                th { background-color: #f8f9fa; }
+                h2 { text-align: center; color: #333; }
+                .generated-date { text-align: right; font-size: 12px; color: #666; margin-top: 20px; }
+            </style>
+        `;
+        
+        let currentDate = new Date().toLocaleDateString();
+        let newWin = window.open("", "", "width=800, height=900");
+        newWin.document.write("<html><head><title>Study Plan</title>" + style + "</head><body>");
+        newWin.document.write("<h2>📚 Study Plan</h2>");
+        newWin.document.write(tableHTML);
+        newWin.document.write(`<div class="generated-date">Generated on: ${currentDate}</div>`);
+        newWin.document.write("</body></html>");
+        newWin.document.close();
+        
+        setTimeout(() => {
+            newWin.print();
+            newWin.close();
+        }, 500);
+    });
+</script>
+
+{% endblock %}

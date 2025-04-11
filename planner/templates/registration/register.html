@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  :root {
+    --primary: #4361ee;
+    --primary-dark: #3a0ca3;
+    --secondary: #7209b7;
+    --accent: #f72585;
+    --light: #f8edeb;
+    --dark: #222;
+    --glass: rgba(255, 255, 255, 0.25);
+    --glass-darker: rgba(255, 255, 255, 0.92);
+    --shadow-soft: 0 8px 32px rgba(31, 38, 135, 0.15);
+    --shadow-strong: 0 8px 32px rgba(31, 38, 135, 0.37);
+  }
+
+  .page-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(45deg, #0f172a, #334155);
+    padding: 30px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .animated-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.6;
+    animation: float 25s infinite ease-in-out;
+    z-index: -1;
+  }
+
+  .orb-1 {
+    width: 400px;
+    height: 400px;
+    top: -100px;
+    left: -100px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+  }
+
+  .orb-2 {
+    width: 600px;
+    height: 600px;
+    bottom: -200px;
+    right: -100px;
+    background: linear-gradient(to right, var(--accent), var(--secondary));
+    animation-delay: -5s;
+  }
+
+  @keyframes float {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(80px, -40px) scale(1.05); }
+    66% { transform: translate(-60px, 20px) scale(0.95); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+
+  .register-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .glass-card {
+    background: var(--glass-darker);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: var(--shadow-soft);
+    padding: 2.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .glass-card:hover {
+    box-shadow: var(--shadow-strong);
+  }
+
+  h2 {
+    color: var(--dark);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: 700;
+    font-size: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+    font-weight: 600;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s;
+  }
+
+  input:focus {
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+    border-color: var(--primary);
+    background: white;
+    outline: none;
+  }
+
+  button {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(to right, var(--primary), var(--primary-dark));
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  button:hover {
+    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.35);
+    transform: translateY(-2px);
+  }
+
+  .helptext {
+    display: block;
+    font-size: 0.875rem;
+    color: #666;
+    margin-top: 0.25rem;
+  }
+
+  .errorlist {
+    color: var(--danger);
+    list-style: none;
+    padding: 0;
+    margin: 0.25rem 0;
+    font-size: 0.875rem;
+  }
+</style>
+
+<div class="page-wrapper">
+  <div class="animated-background">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <div class="register-container">
+    <div class="glass-card">
+      <h2>Create Account</h2>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
